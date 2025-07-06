@@ -1,28 +1,37 @@
 import numpy as np
+from typing import List, Optional
 
 # Definição dos estados do clima
-states = ["Ensolarado", "Nublado", "Chuvoso"]
+states: List[str] = ["Ensolarado", "Nublado", "Chuvoso"]
 
-# Matriz de transição de estados
-# As probabilidades em cada linha somam 1
-transition_matrix = [
+# Matriz de transição de estados como numpy array
+transition_matrix: np.ndarray = np.array([
     [0.8, 0.15, 0.05],  # Transições a partir de "Ensolarado"
     [0.2, 0.6, 0.2],    # Transições a partir de "Nublado"
     [0.25, 0.25, 0.5]   # Transições a partir de "Chuvoso"
-]
+])
 
-# Estado inicial
-initial_state = "Nublado"
-
-# Número de dias a prever
-num_days = 10
-
-# Função para encontrar o índice de um estado
-def get_state_index(state):
+def get_state_index(state: str) -> int:
+    """Retorna o índice do estado na lista de estados."""
     return states.index(state)
 
-# Função para prever o clima para os próximos dias
-def predict_weather(initial_state, num_days):
+def predict_weather(
+    initial_state: str, 
+    num_days: int, 
+    seed: Optional[int] = None
+) -> List[str]:
+    """
+    Prevê o clima para os próximos dias usando uma cadeia de Markov.
+    
+    Args:
+        initial_state: Estado inicial do clima.
+        num_days: Número de dias a prever.
+        seed: Semente para reprodutibilidade (opcional).
+    Returns:
+        Lista com a previsão dos estados do clima.
+    """
+    if seed is not None:
+        np.random.seed(seed)
     current_state = initial_state
     forecast = [current_state]
 
@@ -37,11 +46,14 @@ def predict_weather(initial_state, num_days):
 
     return forecast
 
-# Realizar a previsão
-forecast = predict_weather(initial_state, num_days)
+if __name__ == "__main__":
+    initial_state = "Nublado"
+    num_days = 10
+    seed = 42  # Para reprodutibilidade, pode remover se não quiser
 
-# Exibir a previsão
-print(f"Estado inicial: {initial_state}")
-print("Previsão para os próximos dias:")
-for day, state in enumerate(forecast, start=1):
-    print(f"Dia {day}: {state}")
+    forecast = predict_weather(initial_state, num_days, seed=seed)
+
+    print(f"Estado inicial: {initial_state}")
+    print("Previsão para os próximos dias:")
+    for day, state in enumerate(forecast, start=1):
+        print(f"Dia {day:2d}: {state}")
